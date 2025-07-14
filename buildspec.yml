@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 005698944845.dkr.ecr.us-east-1.amazonaws.com)
+      - REPO_URI=005698944845.dkr.ecr.us-east-1.amazonaws.com/django/aws-pipeline-project
+      - IMAGE_TAG=latest
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t $REPO_URI:$IMAGE_TAG .
+
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
+      - docker push $REPO_URI:$IMAGE_TAG
+      - echo Build and push complete.
+
+artifacts:
+  files:
+    - '**/*'
